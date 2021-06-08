@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-06-04T16:20:54Z",
+        "date": "2021-06-08T10:03:36Z",
         "groups": [
             {
                 "name": "Templates/Modules"
@@ -24,20 +24,6 @@
                 ],
                 "items": [
                     {
-                        "name": "HTTPS service is running",
-                        "type": "SIMPLE",
-                        "key": "net.tcp.service[https,{HOST.CONN},{$SSL_PORT}]",
-                        "history": "1w",
-                        "applications": [
-                            {
-                                "name": "SSL and TLS"
-                            }
-                        ],
-                        "valuemap": {
-                            "name": "Service state"
-                        }
-                    },
-                    {
                         "name": "Certificate expire",
                         "type": "EXTERNAL",
                         "key": "ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"]",
@@ -58,13 +44,15 @@
                             },
                             {
                                 "expression": "({last()}<7)\nand\n({last()}>=0)",
+                                "recovery_mode": "RECOVERY_EXPRESSION",
+                                "recovery_expression": "{last()}>7",
                                 "name": "The certificate on {HOST.NAME} (service {$SSL_PORT}) expires in less than 7 days",
                                 "priority": "AVERAGE",
                                 "description": "{ITEM.LASTVALUE1} to expire",
                                 "dependencies": [
                                     {
                                         "name": "Failed to get certificate at {HOST.NAME} (service {$SSL_PORT})",
-                                        "expression": "({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(#3)}=-65535)\nor\n({SSL and TLS certificate:ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(#3)}=-65535)"
+                                        "expression": "({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(10m)}=-65535)\nor\n({SSL and TLS certificate:ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(10m)}=-65535)"
                                     },
                                     {
                                         "name": "The certificate on {HOSTNAME} (service {$SSL_PORT}) is expired",
@@ -75,13 +63,20 @@
                             },
                             {
                                 "expression": "({last()}<{$SSL_DAYS})\nand\n({last()}>=0)",
+                                "recovery_mode": "RECOVERY_EXPRESSION",
+                                "recovery_expression": "{last()}>{$SSL_DAYS}",
                                 "name": "The certificate on {HOSTNAME} (service {$SSL_PORT}) expires in less than {$SSL_DAYS} days",
                                 "priority": "WARNING",
                                 "description": "{ITEM.LASTVALUE1} to expire",
                                 "dependencies": [
                                     {
+                                        "name": "Failed to get certificate at {HOST.NAME} (service {$SSL_PORT})",
+                                        "expression": "({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(10m)}=-65535)\nor\n({SSL and TLS certificate:ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(10m)}=-65535)"
+                                    },
+                                    {
                                         "name": "The certificate on {HOST.NAME} (service {$SSL_PORT}) expires in less than 7 days",
-                                        "expression": "({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].last()}<7)\nand\n({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].last()}>=0)"
+                                        "expression": "({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].last()}<7)\nand\n({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].last()}>=0)",
+                                        "recovery_expression": "{SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].last()}>7"
                                     }
                                 ]
                             },
@@ -95,7 +90,7 @@
                                 "dependencies": [
                                     {
                                         "name": "Failed to get certificate at {HOST.NAME} (service {$SSL_PORT})",
-                                        "expression": "({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(#3)}=-65535)\nor\n({SSL and TLS certificate:ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(#3)}=-65535)"
+                                        "expression": "({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(10m)}=-65535)\nor\n({SSL and TLS certificate:ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(10m)}=-65535)"
                                     },
                                     {
                                         "name": "The certificate on {HOSTNAME} (service {$SSL_PORT}) is invalid",
@@ -130,7 +125,7 @@
                                 "dependencies": [
                                     {
                                         "name": "Failed to get certificate at {HOST.NAME} (service {$SSL_PORT})",
-                                        "expression": "({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(#3)}=-65535)\nor\n({SSL and TLS certificate:ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(#3)}=-65535)"
+                                        "expression": "({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(10m)}=-65535)\nor\n({SSL and TLS certificate:ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(10m)}=-65535)"
                                     }
                                 ]
                             }
@@ -146,18 +141,36 @@
                     {
                         "macro": "{$SSL_PORT}",
                         "value": "443",
-                        "description": "Default port 443 is for HTTPS service with SSL. But the next protocols currently supported for TLS also: \"smtp\", \"pop3\", \"imap\", \"ftp\", \"xmpp\", \"xmpp-server\", \"irc\", \"postgres\", \"mysql\", \"lmtp\", \"nntp\", \"sieve\" and \"ldap\". To check the TLS protocol, use it like this: \"636/ldap\". Also, \"443/tls\" may work."
-                    },
+                        "description": "Default port 443 is for HTTPS service with SSL. But the next protocols currently supported for TLS also: \"smtp\", \"pop3\", \"imap\", \"ftp\", \"xmpp\", \"xmpp-server\", \"irc\", \"postgres\", \"mysql\", \"lmtp\", \"nntp\", \"sieve\" and \"ldap\". To check the TLS protocol, use it like this: \"636/ldap\". Also, \"8443/tls\" may work."
+                    }
+                ],
+                "dashboards": [
                     {
-                        "macro": "{$SSL_PORTS}",
-                        "value": "443/tls,8443/ssl"
+                        "name": "SSL Dashboard",
+                        "widgets": [
+                            {
+                                "type": "GRAPH_CLASSIC",
+                                "width": "24",
+                                "height": "6",
+                                "fields": [
+                                    {
+                                        "type": "GRAPH",
+                                        "name": "graphid",
+                                        "value": {
+                                            "name": "Certificate status",
+                                            "host": "SSL and TLS certificate"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             }
         ],
         "triggers": [
             {
-                "expression": "({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(#3)}=-65535)\nor\n({SSL and TLS certificate:ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(#3)}=-65535)",
+                "expression": "({SSL and TLS certificate:ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(10m)}=-65535)\nor\n({SSL and TLS certificate:ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"].max(10m)}=-65535)",
                 "name": "Failed to get certificate at {HOST.NAME} (service {$SSL_PORT})",
                 "priority": "WARNING"
             }
@@ -169,6 +182,7 @@
                     {
                         "sortorder": "1",
                         "color": "E64A19",
+                        "calc_fnc": "ALL",
                         "item": {
                             "host": "SSL and TLS certificate",
                             "key": "ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"]"
@@ -176,62 +190,19 @@
                     },
                     {
                         "sortorder": "2",
+                        "drawtype": "FILLED_REGION",
                         "color": "4CAF50",
-                        "item": {
-                            "host": "SSL and TLS certificate",
-                            "key": "ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"]"
-                        }
-                    }
-                ]
-            },
-            {
-                "name": "HTTPS service status",
-                "graph_items": [
-                    {
-                        "sortorder": "1",
-                        "drawtype": "BOLD_LINE",
-                        "color": "FF0000",
-                        "item": {
-                            "host": "SSL and TLS certificate",
-                            "key": "net.tcp.service[https,{HOST.CONN},{$SSL_PORT}]"
-                        }
-                    },
-                    {
-                        "sortorder": "2",
-                        "drawtype": "DASHED_LINE",
-                        "color": "2774A4",
-                        "item": {
-                            "host": "SSL and TLS certificate",
-                            "key": "ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"]"
-                        }
-                    },
-                    {
-                        "sortorder": "3",
-                        "drawtype": "DASHED_LINE",
-                        "color": "F7941D",
                         "yaxisside": "RIGHT",
+                        "calc_fnc": "ALL",
                         "item": {
                             "host": "SSL and TLS certificate",
-                            "key": "ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"]"
+                            "key": "ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"]"
                         }
                     }
                 ]
             }
         ],
         "value_maps": [
-            {
-                "name": "Service state",
-                "mappings": [
-                    {
-                        "value": "0",
-                        "newvalue": "Down"
-                    },
-                    {
-                        "value": "1",
-                        "newvalue": "Up"
-                    }
-                ]
-            },
             {
                 "name": "SSL cert validity",
                 "mappings": [
