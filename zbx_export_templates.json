@@ -1,7 +1,7 @@
 {
     "zabbix_export": {
         "version": "5.2",
-        "date": "2021-06-08T10:03:36Z",
+        "date": "2021-06-08T10:14:49Z",
         "groups": [
             {
                 "name": "Templates/Modules"
@@ -112,7 +112,7 @@
                             }
                         ],
                         "valuemap": {
-                            "name": "SSL cert validity"
+                            "name": "SSL and TLS cert validity"
                         },
                         "triggers": [
                             {
@@ -136,7 +136,7 @@
                     {
                         "macro": "{$SSL_DAYS}",
                         "value": "21",
-                        "description": "When to trigger alarm, but there's also a trigger on 7 days left predefined."
+                        "description": "When to trigger an alarm, but there's also a trigger on 7 days left predefined."
                     },
                     {
                         "macro": "{$SSL_PORT}",
@@ -204,8 +204,12 @@
         ],
         "value_maps": [
             {
-                "name": "SSL cert validity",
+                "name": "SSL and TLS cert validity",
                 "mappings": [
+                    {
+                        "value": "-65535",
+                        "newvalue": "failed"
+                    },
                     {
                         "value": "0",
                         "newvalue": "invalid"
