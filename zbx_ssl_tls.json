@@ -1,0 +1,276 @@
+{
+    "zabbix_export": {
+        "version": "5.4",
+        "date": "2022-06-15T09:46:19Z",
+        "groups": [
+            {
+                "uuid": "57b7ae836ca64446ba2c296389c009b7",
+                "name": "Templates/Modules"
+            }
+        ],
+        "templates": [
+            {
+                "uuid": "4a42b74f900b4549b316ca0c794c401b",
+                "template": "SSL and TLS certificate",
+                "name": "SSL and TLS certificate",
+                "description": "It's a custom template by Ihor Romanyshyn from freedom-loving Ukraine, made for own projects. This template is based on https://github.com/selivan/https-ssl-cert-check-zabbix script. The script must be placed at the ExternalScripts directory, usually defined in the /etc/zabbix/zabbix_server.conf file. Usually it's /usr/lib/zabbix/externalscripts, but can differ on your installation.",
+                "groups": [
+                    {
+                        "name": "Templates/Modules"
+                    }
+                ],
+                "items": [
+                    {
+                        "uuid": "ae503cd0c4064516b846b28adc06f54a",
+                        "name": "Certificate expire",
+                        "type": "EXTERNAL",
+                        "key": "ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"]",
+                        "value_type": "FLOAT",
+                        "units": "days",
+                        "valuemap": {
+                            "name": "SSL and TLS expiration"
+                        },
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "SSL and TLS"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "64d0377271db4912a8b7cc8ed6173527",
+                                "expression": "(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])>max(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],2d))\nand\n(max(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],2d)>-65535)",
+                                "name": "SSL certificate has been replaced on {HOST.NAME} (service {$SSL_PORT})",
+                                "priority": "INFO",
+                                "description": "The certificate for the domain appears to be replaced because its validity date changed.",
+                                "manual_close": "YES"
+                            },
+                            {
+                                "uuid": "73df621a66114b88b90adfd51c4c16c3",
+                                "expression": "(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])<7)\nand\n(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])>=0)",
+                                "recovery_mode": "RECOVERY_EXPRESSION",
+                                "recovery_expression": "last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])>7",
+                                "name": "SSL certificate on {HOST.NAME} (service {$SSL_PORT}) expires in less than 7 days",
+                                "priority": "AVERAGE",
+                                "description": "{ITEM.LASTVALUE1} to expire",
+                                "dependencies": [
+                                    {
+                                        "name": "Failed to get certificate at {HOST.NAME} (service {$SSL_PORT})",
+                                        "expression": "(max(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],10m)=-65535)\nor\n(max(/SSL and TLS certificate/ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],10m)=-65535)"
+                                    },
+                                    {
+                                        "name": "SSL certificate on {HOSTNAME} (service {$SSL_PORT}) is expired",
+                                        "expression": "(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])<=0)\nand\n(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])>-65535)",
+                                        "recovery_expression": "(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])>0)"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "c3557b9b81754e6283d61e20440ae20c",
+                                "expression": "(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])<{$SSL_DAYS})\nand\n(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])>=0)",
+                                "recovery_mode": "RECOVERY_EXPRESSION",
+                                "recovery_expression": "last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])>{$SSL_DAYS}",
+                                "name": "SSL certificate on {HOSTNAME} (service {$SSL_PORT}) expires in less than {$SSL_DAYS} days",
+                                "priority": "WARNING",
+                                "description": "{ITEM.LASTVALUE1} to expire",
+                                "dependencies": [
+                                    {
+                                        "name": "Failed to get certificate at {HOST.NAME} (service {$SSL_PORT})",
+                                        "expression": "(max(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],10m)=-65535)\nor\n(max(/SSL and TLS certificate/ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],10m)=-65535)"
+                                    },
+                                    {
+                                        "name": "SSL certificate on {HOST.NAME} (service {$SSL_PORT}) expires in less than 7 days",
+                                        "expression": "(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])<7)\nand\n(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])>=0)",
+                                        "recovery_expression": "last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])>7"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "2385aa331d604c5eb675070efab85ba2",
+                                "expression": "(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])<=0)\nand\n(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])>-65535)",
+                                "recovery_mode": "RECOVERY_EXPRESSION",
+                                "recovery_expression": "(last(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])>0)",
+                                "name": "SSL certificate on {HOSTNAME} (service {$SSL_PORT}) is expired",
+                                "priority": "HIGH",
+                                "description": "{ITEM.LASTVALUE1}",
+                                "dependencies": [
+                                    {
+                                        "name": "Failed to get certificate at {HOST.NAME} (service {$SSL_PORT})",
+                                        "expression": "(max(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],10m)=-65535)\nor\n(max(/SSL and TLS certificate/ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],10m)=-65535)"
+                                    },
+                                    {
+                                        "name": "SSL certificate on {HOSTNAME} (service {$SSL_PORT}) is invalid",
+                                        "expression": "last(/SSL and TLS certificate/ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])=0",
+                                        "recovery_expression": "last(/SSL and TLS certificate/ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])=1"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "b1ea36a221294198a53c66b5f3aa556b",
+                        "name": "Certificate validity",
+                        "type": "EXTERNAL",
+                        "key": "ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"]",
+                        "value_type": "FLOAT",
+                        "valuemap": {
+                            "name": "SSL and TLS cert validity"
+                        },
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "SSL and TLS"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "d6dfa856590a4303bd12959f879c9ce2",
+                                "expression": "last(/SSL and TLS certificate/ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])=0",
+                                "recovery_mode": "RECOVERY_EXPRESSION",
+                                "recovery_expression": "last(/SSL and TLS certificate/ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"])=1",
+                                "name": "SSL certificate on {HOSTNAME} (service {$SSL_PORT}) is invalid",
+                                "priority": "HIGH",
+                                "description": "The certificate appears to be revoked, self-signed, or improperly installed. Anyway, it can't be trusted.",
+                                "dependencies": [
+                                    {
+                                        "name": "Failed to get certificate at {HOST.NAME} (service {$SSL_PORT})",
+                                        "expression": "(max(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],10m)=-65535)\nor\n(max(/SSL and TLS certificate/ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],10m)=-65535)"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$SSL_DAYS}",
+                        "value": "21",
+                        "description": "When to trigger an alarm, but there's also a trigger on 7 days left predefined."
+                    },
+                    {
+                        "macro": "{$SSL_PORT}",
+                        "value": "443",
+                        "description": "Default port 443 is for HTTPS service with SSL. But the next protocols currently supported for TLS also: \"smtp\", \"pop3\", \"imap\", \"ftp\", \"xmpp\", \"xmpp-server\", \"irc\", \"postgres\", \"mysql\", \"lmtp\", \"nntp\", \"sieve\" and \"ldap\". To check the TLS protocol, use it like this: \"636/ldap\". Also, \"8443/tls\" may work."
+                    }
+                ],
+                "dashboards": [
+                    {
+                        "uuid": "15cbdaf5b5b140ab831c902e3e61053b",
+                        "name": "SSL Dashboard",
+                        "pages": [
+                            {
+                                "widgets": [
+                                    {
+                                        "type": "GRAPH_CLASSIC",
+                                        "width": "24",
+                                        "height": "5",
+                                        "fields": [
+                                            {
+                                                "type": "GRAPH",
+                                                "name": "graphid",
+                                                "value": {
+                                                    "name": "Certificate expiration",
+                                                    "host": "SSL and TLS certificate"
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "GRAPH_CLASSIC",
+                                        "name": "Certificate validity",
+                                        "y": "5",
+                                        "width": "24",
+                                        "height": "5",
+                                        "fields": [
+                                            {
+                                                "type": "GRAPH",
+                                                "name": "graphid",
+                                                "value": {
+                                                    "name": "Certificate validity",
+                                                    "host": "SSL and TLS certificate"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "valuemaps": [
+                    {
+                        "uuid": "93614337ac3d478296b8db1408ebca7c",
+                        "name": "SSL and TLS cert validity",
+                        "mappings": [
+                            {
+                                "value": "0",
+                                "newvalue": "invalid"
+                            },
+                            {
+                                "value": "1",
+                                "newvalue": "valid"
+                            },
+                            {
+                                "value": "-65535",
+                                "newvalue": "failed"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "4d1aadf9e7d14a1d833f9a29c3216a92",
+                        "name": "SSL and TLS expiration",
+                        "mappings": [
+                            {
+                                "value": "-65535",
+                                "newvalue": "failed"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "triggers": [
+            {
+                "uuid": "3c77886256f34c258b31782dfbe3b0e6",
+                "expression": "(max(/SSL and TLS certificate/ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],10m)=-65535)\nor\n(max(/SSL and TLS certificate/ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"],10m)=-65535)",
+                "name": "Failed to get certificate at {HOST.NAME} (service {$SSL_PORT})",
+                "priority": "WARNING"
+            }
+        ],
+        "graphs": [
+            {
+                "uuid": "700f070b593748d699b3317c00ae926f",
+                "name": "Certificate expiration",
+                "yaxismin": "-100",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "color": "FFA000",
+                        "item": {
+                            "host": "SSL and TLS certificate",
+                            "key": "ssl_cert_check.sh[\"expire\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"]"
+                        }
+                    }
+                ]
+            },
+            {
+                "uuid": "73de1d9e37504e66918ac918467f6081",
+                "name": "Certificate validity",
+                "yaxismin": "-100",
+                "ymin_type_1": "FIXED",
+                "graph_items": [
+                    {
+                        "sortorder": "1",
+                        "drawtype": "FILLED_REGION",
+                        "color": "00897B",
+                        "item": {
+                            "host": "SSL and TLS certificate",
+                            "key": "ssl_cert_check.sh[\"valid\",\"{HOST.CONN}\",\"{$SSL_PORT}\",\"{HOST.DNS}\"]"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}
